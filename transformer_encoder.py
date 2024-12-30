@@ -4,22 +4,6 @@ import torch.nn.functional as F
 from multi_head_attention import MultiHeadAttention
 
 
-class FeedForwardNetwork(nn.Module):
-    def __init__(self, d_model, d_ff):
-        super(FeedForwardNetwork, self).__init__()
-        self.linear1 = nn.Linear(d_model, d_ff)  # 第一层全连接
-        self.linear2 = nn.Linear(d_ff, d_model)  # 第二层全连接
-        self.activation = nn.ReLU()  # 激活函数
-
-    def forward(self, x):
-        # x: (batch_size, seq_len, d_model)
-        x = self.linear1(x)  # (batch_size, seq_len, d_ff)
-        x = self.activation(x)  # 非线性变换
-        x = self.linear2(x)  # (batch_size, seq_len, d_model)
-        return x
-
-
-
 class FeedForward(nn.Module):
     def __init__(self, d_model, d_ff):
         super(FeedForward, self).__init__()
