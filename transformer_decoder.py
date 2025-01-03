@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
 from multi_head_attention import MultiHeadAttention
+from transformer_nn import FeedForward
+from torch.nn import TransformerDecoderLayer
+
 
 class DecoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
@@ -11,25 +14,15 @@ class DecoderLayer(nn.Module):
         
         self.masked_self_attn = MultiHeadAttention(d_model, num_heads)
         self.encoder_decoder_attn = MultiHeadAttention(d_model, num_heads)
-        self.feed_forward = nn.Sequential(
-            nn.Linear(d_model, d_ff),
-            nn.ReLU(),
-            nn.Linear(d_ff, d_model)
-        )
+        self.feed_forward = FeedForward(d_model, d_ff)
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
         self.norm3 = nn.LayerNorm(d_model)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x, encoder_output, tgt_mask):
-        # 掩码多头自注意力 + 残差连接 + 层归一化
-        # 先进行线性变换
-        Q = self.query(x)
-        K = self.key(x)
-        V = self.value(x)
-        
         # 掩码多头自注意力
-        attn_output = self.masked_self_attn(Q, K, V, tgt_mask)
+        attn_output = self.masked_self_attn(x, x, x, tgt_mask)
         x = self.norm1(x + self.dropout(attn_output))
 
         # 编码器-解码器注意力 + 残差连接 + 层归一化

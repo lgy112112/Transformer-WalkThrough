@@ -17,7 +17,7 @@ class MultiHeadAttention(nn.Module):
     def forward(self, Q, K, V, mask=None):
         batch_size, seq_len, d_model = Q.shape
         
-        # 线性变换（已移动到DecoderLayer中）
+        # QKV映射
         Q = self.query(Q)
         K = self.key(K)
         V = self.value(V)

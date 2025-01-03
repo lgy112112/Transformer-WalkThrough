@@ -2,35 +2,47 @@ import torch
 import torch.nn as nn
 import math
 
-class InputPreprocessor(nn.Module):
+class TransformerPreprocessor(nn.Module):
     def __init__(self, vocab_size, d_model, max_seq_len):
-        super(InputPreprocessor, self).__init__()
+        super(TransformerPreprocessor, self).__init__()
         self.embedding = nn.Embedding(vocab_size, d_model)
-        self.position_encoding = self._generate_position_encoding(max_seq_len, d_model)
+        self.position_encoding = PositionalEncoding(d_model, max_seq_len)
         
-    def _generate_position_encoding(self, max_seq_len, d_model):
-        position = torch.arange(max_seq_len).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
-        pe = torch.zeros(max_seq_len, d_model)
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        return pe.unsqueeze(0)  # (1, max_seq_len, d_model)
-    
     def forward(self, x):
         # x: (batch_size, seq_len)
-        seq_len = x.size(1)
         embeddings = self.embedding(x)  # (batch_size, seq_len, d_model)
-        position_encodings = self.position_encoding[:, :seq_len, :]  # (1, seq_len, d_model)
-        return embeddings + position_encodings  # (batch_size, seq_len, d_model)
+        output = self.position_encoding(embeddings)  # (batch_size, seq_len, d_model)
+        return output
 
-# 使用示例
-vocab_size = 10000
-d_model = 512
-max_seq_len = 100
-batch_size = 32
-seq_len = 50
+class PositionalEncoding:
+    def __init__(self, d_model, max_len=5000):
+        self.d_model = d_model
+        self.max_len = max_len
+        self.pe = self._generate_position_encoding()
+        
+    def _generate_position_encoding(self):
+        position = torch.arange(self.max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, self.d_model, 2) * 
+                           -(math.log(10000.0) / self.d_model))
+        pe = torch.zeros(self.max_len, self.d_model)
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        return pe.unsqueeze(0)  # (1, max_len, d_model)
+    
+    def __call__(self, x):
+        # x: (batch_size, seq_len, d_model)
+        seq_len = x.size(1)
+        return x + self.pe[:, :seq_len, :]
 
-preprocessor = InputPreprocessor(vocab_size, d_model, max_seq_len)
-input_ids = torch.randint(0, vocab_size, (batch_size, seq_len))  # 随机生成输入
-output = preprocessor(input_ids)
-print(output.shape)  # 输出: torch.Size([32, 50, 512])
+if __name__ == "__main__":
+    # 使用示例
+    vocab_size = 10000
+    d_model = 512
+    max_seq_len = 100
+    batch_size = 32
+    seq_len = 50
+
+    preprocessor = TransformerPreprocessor(vocab_size, d_model, max_seq_len)
+    input_ids = torch.randint(0, vocab_size, (batch_size, seq_len))  # 随机生成输入
+    output = preprocessor(input_ids)
+    print(output.shape)  # 输出: torch.Size([32, 50, 512])
