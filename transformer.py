@@ -58,6 +58,21 @@ if __name__ == "__main__":
 
     # 初始化Transformer模型
     transformer = Transformer(vocab_size, d_model, num_heads, num_layers, d_ff, max_seq_len, dropout)
+    print("Transformer模型初始化完成")
+
+    # 检查模型参数
+    print("Transformer模型参数:")
+    for name, param in transformer.named_parameters():
+        print(f"{name}: {param.shape}")
+    # 打印模型结构
+    print("\n")
+    print("Transformer模型结构:")
+    print(transformer)
+    # 打印参数量
+    print("\n")
+    print("Transformer模型参数量:")
+    print(sum(p.numel() for p in transformer.parameters()))
+    
 
     # 生成输入数据
     src = torch.randint(0, vocab_size, (batch_size, seq_len))  # 源序列
