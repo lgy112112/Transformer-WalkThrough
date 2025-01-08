@@ -32,6 +32,7 @@ class MultiHeadAttention(nn.Module):
         
         # 应用mask（如果存在）
         if mask is not None:
+            mask = mask.unsqueeze(0).unsqueeze(1)  # 确保mask形状与scores匹配
             scores = scores.masked_fill(mask == 0, float('-inf'))
             
         attention = F.softmax(scores, dim=-1)
@@ -43,6 +44,7 @@ class MultiHeadAttention(nn.Module):
         # 线性变换
         out = self.fc_out(out)
         return out
+
 
 if __name__ == "__main__":
     # 参数设置
