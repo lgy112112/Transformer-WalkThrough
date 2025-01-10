@@ -30,7 +30,7 @@ class Transformer(nn.Module):
         return output
 
     def make_src_mask(self, src, src_pad_idx):
-        src_mask = (src != src_pad_idx).unsqueeze(1).unsqueeze(3)
+        src_mask = (src != src_pad_idx).unsqueeze(1).unsqueeze(2)
         return src_mask.to(torch.bool)  # 使用 bool 类型
 
     def make_trg_mask(self, trg, trg_pad_idx):
