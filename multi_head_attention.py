@@ -32,7 +32,9 @@ class MultiHeadAttention(nn.Module):
         
         # 应用mask（如果存在）
         if mask is not None:
-            mask = mask.unsqueeze(0).unsqueeze(1)  # 确保mask形状与scores匹配
+            # mask = mask.unsqueeze(0).unsqueeze(1)  # 确保mask形状与scores匹配
+            print(f"mask shape: {mask.shape}")
+            print(f"scores shape: {scores.shape}")
             scores = scores.masked_fill(mask == 0, float('-inf'))
             
         attention = F.softmax(scores, dim=-1)
@@ -59,6 +61,7 @@ if __name__ == "__main__":
     # 生成输入数据
     x = torch.randn(batch_size, seq_len, d_model)  # 输入序列
     mask = torch.tril(torch.ones(seq_len, seq_len))  # 下三角掩码
+    # print(mask.shape)
     
     # 前向传播
     output = masked_attn(x, x, x, mask)
