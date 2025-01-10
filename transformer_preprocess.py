@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import math
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 class TransformerPreprocessor(nn.Module):
     def __init__(self, vocab_size, d_model, max_seq_len):
         super(TransformerPreprocessor, self).__init__()
@@ -31,8 +32,11 @@ class PositionalEncoding:
     
     def __call__(self, x):
         # x: (batch_size, seq_len, d_model)
+        x = x.to(device)
         seq_len = x.size(1)
-        return x + self.pe[:, :seq_len, :]
+        pe_result = self.pe[:, :seq_len, :]
+        pe_result = pe_result.to(device)
+        return x + pe_result
 
 if __name__ == "__main__":
     # 使用示例

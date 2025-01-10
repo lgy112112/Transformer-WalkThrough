@@ -45,9 +45,9 @@ class MultiHeadAttention(nn.Module):
         if mask is not None:
             # 例如 mask 的形状可以是 [batch_size, 1, Q_len, K_len]
             # 或能broadcast到 [batch_size, num_heads, Q_len, K_len]
-            print(f"mask shape in mha: {mask.shape}")
-            print(f"scores shape in mha: {scores.shape}")
-            scores = scores.masked_fill(mask == 0, float('-inf'))
+            # print(f"mask shape in mha: {mask.shape}")
+            # print(f"scores shape in mha: {scores.shape}")
+            scores = scores.masked_fill(mask == 0, float('-1e10')) # 在实际训练时，我将float('-inf')改为了float('-1e10')，不然的话会引起loss nan
 
         attention = F.softmax(scores, dim=-1)
 

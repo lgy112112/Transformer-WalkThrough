@@ -2,3 +2,4 @@
 /.vscode
 *.pth
 Multi30K/
+datasets/
