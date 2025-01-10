@@ -40,6 +40,7 @@ class Transformer(nn.Module):
         trg_sub_mask = trg_sub_mask.unsqueeze(0).unsqueeze(0)  # [1, 1, seq_len, seq_len]
         trg_sub_mask = trg_sub_mask.to(torch.bool)  # 将 trg_sub_mask 转换为 bool 类型
         trg_mask = trg_pad_mask & trg_sub_mask  # [batch_size, 1, seq_len, seq_len]
+        # print(f"trg_mask shape in func: {trg_mask.shape}")
         return trg_mask.to(torch.bool)  # 使用 bool 类型
 
 if __name__ == "__main__":
@@ -78,10 +79,17 @@ if __name__ == "__main__":
     src = torch.randint(0, vocab_size, (batch_size, seq_len))  # 源序列
     tgt = torch.randint(0, vocab_size, (batch_size, seq_len))  # 目标序列
 
+    # 打印输入数据形状和最大值
+    print("src shape:", src.shape)  # 应为 [batch_size, seq_len]
+    print("tgt shape:", tgt.shape)  # 应为 [batch_size, seq_len]
+    print("src max:", src.max().item(), "tgt max:", tgt.max().item())  # 应小于 vocab_size
+
     # 生成掩码
     src_mask = transformer.make_src_mask(src, src_pad_idx)  # 源序列的掩码
     tgt_mask = transformer.make_trg_mask(tgt, trg_pad_idx)  # 目标序列的掩码
 
+    print("src_mask shape:", src_mask.shape)  # 应为 [batch_size, 1, seq_len, 1]
+    print("tgt_mask shape:", tgt_mask.shape)  # 应为 [batch_size, 1, seq_len, seq_len]
     # 前向传播
     output = transformer(src, tgt, src_mask, tgt_mask)
 

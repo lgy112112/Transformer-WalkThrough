@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from multi_head_attention import MultiHeadAttention
 from transformer_nn import FeedForward
+from transformer_preprocess import TransformerPreprocessor
 
 class DecoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, dropout=0.1):
@@ -54,7 +55,11 @@ if __name__ == "__main__":
     # 输入数据
     batch_size = 32
     seq_len = 50
-    x = torch.randn(batch_size, seq_len, d_model)  # 目标序列的嵌入表示
+    
+    preprocessor = TransformerPreprocessor(10000, d_model, 100) # vocab_size, d_model, max_seq_len
+    input_ids = torch.randint(0, 10000, (batch_size, seq_len))  # 随机生成输入
+    x = preprocessor(input_ids)  # 从预处理模块生成目标序列的嵌入表示
+    
     encoder_output = torch.randn(batch_size, seq_len, d_model)  # 编码器的输出
 
     # 掩码
