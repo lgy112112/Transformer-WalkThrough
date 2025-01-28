@@ -1,12 +1,13 @@
 import re
 from collections import Counter
 
-class CustomTokenizer:
+class Tokenizer:
     def __init__(self, vocab_size=10000, lower=True):
         self.vocab_size = vocab_size
         self.lower = lower
         self.word2idx = {"<PAD>": 0, "<UNK>": 1, "<SOS>": 2, "<EOS>": 3}  # 特殊标记
         self.idx2word = {0: "<PAD>", 1: "<UNK>", 2: "<SOS>", 3: "<EOS>"}
+        self.pad_token_id = self.word2idx["<PAD>"]
     
     def fit(self, texts):
         # 文本预处理
@@ -40,22 +41,51 @@ class CustomTokenizer:
         text = re.sub(r"([.,!?'])", r" \1 ", text)
         text = re.sub(r"\s+", " ", text)  # 去除多余空格
         return text.strip()
+    
+    def get_vocab_size(self):
+        return len(self.word2idx)
+    
+    # def pad
 
+
+def demo(check_en_or_de: str):
+    if check_en_or_de == "de":
+        # 加载数据
+        with open("datasets/train/train.de", "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        # 初始化 tokenizer
+        tokenizer = CustomTokenizer(vocab_size=10000)
+        tokenizer.fit(lines)  # 使用训练数据拟合词汇表
+
+        # 示例: 分词和编码
+        sample_sentence = "Zwei junge weiße Männer sind im Freien in der Nähe vieler Büsche."
+        tokens = tokenizer.tokenize(sample_sentence)
+        decoded_sentence = tokenizer.detokenize(tokens)
+
+        print("Original Sentence:", sample_sentence)
+        print("Token IDs:", tokens)
+        print("Decoded Sentence:", decoded_sentence)
+        
+    elif check_en_or_de == "en":
+        # 加载数据
+        with open("datasets/train/train.en", "r", encoding="utf-8") as file:
+            lines = file.readlines()
+
+        # 初始化 tokenizer
+        tokenizer = CustomTokenizer(vocab_size=10000)
+        tokenizer.fit(lines)  # 使用训练数据拟合词汇表
+
+        # 示例: 分词和编码
+        sample_sentence = "Several men in hard hats are operating a giant pulley system."
+        tokens = tokenizer.tokenize(sample_sentence)
+        decoded_sentence = tokenizer.detokenize(tokens)
+
+        print("Original Sentence:", sample_sentence)
+        print("Token IDs:", tokens)
+        print("Decoded Sentence:", decoded_sentence)
 
 if __name__ == "__main__":
-    # 加载数据
-    with open("datasets/train/train.en", "r", encoding="utf-8") as file:
-        lines = file.readlines()
-
-    # 初始化 tokenizer
-    tokenizer = CustomTokenizer(vocab_size=10000)
-    tokenizer.fit(lines)  # 使用训练数据拟合词汇表
-
-    # 示例: 分词和编码
-    sample_sentence = "Two young, White males are outside near many bushes."
-    tokens = tokenizer.tokenize(sample_sentence)
-    decoded_sentence = tokenizer.detokenize(tokens)
-
-    print("Original Sentence:", sample_sentence)
-    print("Token IDs:", tokens)
-    print("Decoded Sentence:", decoded_sentence)
+    demo("de")
+    print('\n')
+    demo("en")
